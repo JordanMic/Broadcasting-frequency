@@ -1,0 +1,16 @@
+body{
+    background-color: #1d0d50;
+}
+
+main{
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+}
+
+h1{
+    color: white;
+    font-size: 45px;
+    font-family: arial;
+}
