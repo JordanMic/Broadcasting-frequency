@@ -34,7 +34,7 @@ input {
     padding: 20px;
 }
 
-#console {
+.console {
     box-sizing: border-box;
     padding: 10px;
     background-color: black;
@@ -46,5 +46,9 @@ input {
 
 #fi-res,
 #sc-res {
+    color: white;
+}
+
+span {
     color: white;
 }
