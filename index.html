@@ -16,14 +16,16 @@
 
     <main>
         <h1>13. Problem przydziału częstotliwości w sieci komórkowej</h1>
-        <a href="#" onclick="Write();">Generuj strukture xml</a>
+        <a href="#" onclick="Write();">Generuj strukture gxl</a>
 
         <br /><br />
         <p id="fi-res">Wyjście:</p>
         <form><textarea id="ExampleOutput" style="width:100%" rows="10"></textarea></form>
         <input type="file" accept=".gxl" onchange="openFile(event)">
         <p id="sc-res">Wyjście:</p>
-        <p class="console"><span id="result"></span></p>
+        <p class="console"><span id="result"></span>
+            <spam id="colorresult"></spam>
+        </p>
     </main>
 
     <script language="javascript" type="text/javascript">
@@ -42,16 +44,20 @@
         }
 
         //tablica przechowująca dane o nadajnikach
-        var transmitersNumber = 4;
-        var transmiters = new Array();
+        let transmitersNumber = 6;
+        let transmiters = new Array();
 
         //konstruktor obiektu nadajnika
-        function Transmiter(x, y, r) {
+        function Transmiter(x, y, r, c) {
             this.x = x;
             this.y = y;
             this.r = r;
+            this.c = c;
         }
 
+
+
+        //konstruktor obiektu krawędzi
         function TransmiterEdge(f, t) {
             this.f = f;
             this.t = t;
@@ -65,13 +71,14 @@
 
             var XML = new XMLWriter();
 
-            var x, y, r;
+            let x, y, r;
 
-            for (var i = 0; i < transmitersNumber; i++) {
+            for (let i = 0; i < transmitersNumber; i++) {
 
-                x = rand(1, 20);
-                y = rand(1, 20);
-                r = rand(1, 20);
+                x = rand(1.0, 20.0);
+                y = rand(1.0, 20.0);
+                r = rand(1.0, 5.0);
+                c = null;
 
 
                 XML.BeginNode("node");
@@ -102,15 +109,10 @@
 
 
                 // wrzucanie nadajników do tablicy
-                transmiters[i] = new Transmiter(x, y, r);
+                transmiters[i] = new Transmiter(x, y, r, c);
 
             }
         }
-
-
-
-
-
 
         //wybór pliku i wcztanie:
         let openFile = function (event) {
@@ -123,15 +125,6 @@
                 let text = reader.result;
                 parser = new DOMParser();
                 gxl = parser.parseFromString(text, "text/xml");
-
-
-
-                //dodanie Wierzchołków do tablicy gxlNode
-                // const gxlNode = new Array();
-                // for (let i = 0; i <= gxl.getElementByTagName("node").length; i++) {
-                //     gxlNode.push([gxl.getElementByTagName("node")[i].id]);
-                // }
-
 
 
                 let k = 0;
@@ -170,54 +163,93 @@
 
 
                     addVertex(v) {
-                        // inicjalizacja sąsiadującej listy z
-                        // null array 
+                        // inicjalizacja sąsiadującej listy
                         this.AdjList.set(v, []);
                     }
 
                     addEdge(v, w) {
-                        // pobierz liste z wierzchołkami v i wsadź
-                        // vertex w denoting edge between v and w 
                         this.AdjList.get(v).push(w);
 
-                        // Gdy graf nie skierowany
-                        // dodaj krawędź w obie strony
-                        // this.AdjList.get(w).push(v);
                     }
 
 
                     // Prints the vertex and adjacency list 
                     printGraph() {
 
-                        var print;
-                        // get all the vertices 
-                        var get_keys = this.AdjList.keys();
+                        let print;
+                        let get_keys = this.AdjList.keys();
 
-                        // iterate over the vertices 
-                        for (var i of get_keys) {
-                            // great the corresponding adjacency list 
-                            // for the vertex 
-                            var get_values = this.AdjList.get(i);
-                            var conc = "";
+                        for (let i of get_keys) {
+                            let get_values = this.AdjList.get(i);
+                            let conc = "";
 
-                            // iterate over the adjacency list 
-                            // concatenate the values into a string 
-                            for (var j of get_values)
+                            for (let j of get_values)
                                 conc += j + " ";
 
-                            // print the vertex and its adjacency list 
                             console.log(i + " -> " + conc);
-                            print += i + " -> " + conc + "<br />";
+
+                            if (print == undefined) {
+                                print = i + " -> " + conc + "<br />";
+                            } else {
+                                print += i + " -> " + conc + "<br />";
+                            }
                         }
 
                         return print;
+                    }
+
+
+
+                    //kolorowanie wierzchołów
+                    color() {
+
+                        let print;
+                        let colored = new Array();
+                        let useColor = 0;
+
+
+                        let get_keys = this.AdjList.keys();
+
+                        for (let i of get_keys) {
+
+                            let get_values = this.AdjList.get(i);
+
+
+                            for (let j of get_values) {
+
+                                // useColor = 0;
+                                if (transmiters[j].c == null) {
+                                    continue;
+                                } else {
+                                    useColor = transmiters[j].c + 1;
+                                }
+
+                                console.log(j);
+                            }
+
+                            transmiters[i].c = useColor;
+                            useColor = 0;
+                            if (print == undefined) {
+                                print = "nadajnik: " + i + " kolor: " + transmiters[i].c +
+                                    "<br />";
+                            } else {
+                                print += "nadajnik: " + i + " kolor: " + transmiters[i].c +
+                                    "<br />";
+                            }
+
+
+                        }
+
+                        return print;
+
+
                     }
                 }
 
 
                 // użycie klasy graph
-                var g = new Graph(transmitersNumber); //gxl.getElementByTagName("node").lenght
-                var vertices = new Array();
+                let g = new Graph(transmitersNumber); //gxl.getElementByTagName("node").lenght
+                let vertices = new Array();
 
                 for (i = 0; i < transmitersNumber; i++) {
                     vertices[i] = i;
@@ -233,46 +265,14 @@
                     g.addEdge(transmitersEdges[i].f, transmitersEdges[i].t);
                 }
 
-                // wypisanie grafu w postaci sąsiadującej listy
-                // A -> B D E 
-                // B -> A C 
-                // C -> B E F 
-                // D -> A E 
-                // E -> A D F C 
-                // F -> E C 
 
-                document.getElementById("result").innerHTML = g.printGraph();
+                document.getElementById("result").innerHTML = g.printGraph() + "<br />" +
+                    "Kolorowanie grafów: " + "<br />";
+
+                document.getElementById("colorresult").innerHTML = g.color();
 
             }
         }
-
-
-
-
-        // function Transmiter(x, y, r) {
-        //     this.x = x;
-        //     this.y = y;
-        //     this.r = r;
-        // }
-        //
-        // //wybor liczby nadajników i stworzenie tablicy z nadajnikami
-        // let transmitersNumber = 3;
-        // let transmiters = new Array();
-        //
-        // // wrzucanie nadajników do tablicy
-        // for (let i = 0; i < transmitersNumber; i++) {
-        //     transmiters[i] = new Transmiter(rand(1, 20), rand(1, 20), rand(1, 10));
-        // }
-        //
-        // for (i = 0; i < transmitersNumber; i++) {
-        //     for (let j = 0; j < transmitersNumber; j++) {
-        //
-        //     }
-        // }
-        // console.log(transmiters);
-
-
-        //console.log(transmiters);
     </script>
 
 
